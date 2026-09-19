@@ -35,39 +35,51 @@ struct UsageWidgetView: View {
     var entry: Entry
     @Environment(\.widgetFamily) private var family
 
+    private var isSmall: Bool { family == .systemSmall }
+
     var body: some View {
         let left = entry.snap.percentLeft.map { "\(Int($0.rounded()))%" } ?? "нет %"
         let used = entry.snap.percentUsed.map { "\(Int($0.rounded()))% использовано" } ?? "—"
         GeometryReader { geo in
-            let lead = geo.size.width * 0.15
-            let vPad = geo.size.height * 0.05
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Неделя Grok").font(.headline)
-                Text(left).font(.title2.bold())
-                ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100)).tint(.orange)
-                if family != .systemSmall {
+            let lead = geo.size.width * 0.05
+            ZStack(alignment: .bottomTrailing) {
+                VStack(alignment: .leading, spacing: isSmall ? 4 : 6) {
+                    if isSmall { Spacer(minLength: 10) }
+                    Text("Неделя Grok")
+                        .font(isSmall ? .subheadline.weight(.semibold) : .headline)
+                    Text(left)
+                        .font(isSmall ? .title3.bold() : .title2.bold())
+                    ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100))
+                        .tint(.orange)
                     Text(used)
+                        .font(isSmall ? .caption : .body)
                     if let reset = entry.snap.resetAt {
                         Text("сброс \(reset.formatted(date: .abbreviated, time: .shortened))")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                     }
                     Text(entry.snap.updatedAt.formatted(date: .omitted, time: .shortened))
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
                 }
-                Spacer(minLength: 0)
-                HStack {
-                    Spacer()
-                    Button(intent: RefreshUsageIntent()) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .buttonStyle(.plain)
-                    .tint(.orange)
+                .padding(.leading, lead)
+                .padding(.trailing, isSmall ? 28 : 16)
+                .padding(.top, isSmall ? 8 : 10)
+                .padding(.bottom, 28)
+
+                Button(intent: RefreshUsageIntent()) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 14, weight: .semibold))
+                        .padding(8)
                 }
-                .padding(.top, vPad)
-                .padding(.bottom, vPad)
+                .buttonStyle(.plain)
+                .tint(.white)
+                .padding(.trailing, 8)
+                .padding(.bottom, 8)
             }
-            .padding(.leading, lead)
-            .padding(.trailing, 12)
         }
         .containerBackground(for: .widget) { Color.black }
     }
