@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var snap = UsageStore.load()
     @State private var userCode = ""
     @State private var status = ""
     @State private var busy = false
+    @State private var pending: XAIAuth.DeviceStart?
 
     var body: some View {
         NavigationStack {
@@ -19,7 +21,10 @@ struct ContentView: View {
                     ring
                     breakdown
 
-                    if !userCode.isEmpty {
+                    if let pending {
+                        Text("Код: \(pending.userCode)")
+                            .font(.title2.monospaced())
+                    } else if !userCode.isEmpty {
                         Text("Код: \(userCode)")
                             .font(.title2.monospaced())
                     }
@@ -38,6 +43,16 @@ struct ContentView: View {
                     .tint(.orange)
                     .disabled(busy)
 
+                    if pending != nil {
+                        Button { Task { await finishLogin() } } label: {
+                            Label("Я уже авторизовал", systemImage: "checkmark.circle")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                        .disabled(busy)
+                    }
+
                     Button { Task { await refresh() } } label: {
                         Label("Обновить пул", systemImage: "arrow.clockwise")
                             .frame(maxWidth: .infinity)
@@ -47,6 +62,8 @@ struct ContentView: View {
 
                     Button(role: .destructive) {
                         TokenStore.clear()
+                        XAIAuth.clearPending()
+                        pending = nil
                         snap = .empty
                         UsageStore.save(snap)
                     } label: {
@@ -58,7 +75,16 @@ struct ContentView: View {
                 .padding(20)
             }
             .background(Color.black.ignoresSafeArea())
-            .task { if TokenStore.load() != nil { await refresh() } }
+            .task {
+                pending = XAIAuth.loadPending()
+                if TokenStore.load() != nil { await refresh() }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    pending = XAIAuth.loadPending()
+                    if pending != nil { Task { await finishLogin() } }
+                }
+            }
         }
     }
 
@@ -121,14 +147,34 @@ struct ContentView: View {
         status = "Запрашиваю код…"
         do {
             let start = try await XAIAuth.startDevice()
+            pending = start
             userCode = start.userCode
-            status = "Введи код на странице xAI"
+            status = "Открой xAI, введи код, вернись сюда и нажми «Я уже авторизовал»"
             XAIAuth.open(start.verifyURL)
-            let tokens = try await XAIAuth.poll(start)
-            TokenStore.save(tokens)
-            userCode = ""
-            status = "Вход есть, тяну usage…"
-            await refresh()
+        } catch {
+            status = error.localizedDescription
+        }
+        busy = false
+    }
+
+    @MainActor
+    private func finishLogin() async {
+        guard let start = pending ?? XAIAuth.loadPending() else {
+            status = "Сначала запроси код"
+            return
+        }
+        busy = true
+        status = "Забираю токен…"
+        do {
+            if let tokens = try await XAIAuth.tryTokenOnce(start) {
+                TokenStore.save(tokens)
+                pending = nil
+                userCode = ""
+                status = "Вход есть, тяну usage…"
+                await refresh()
+            } else {
+                status = "xAI ещё не отдал токен. Закрой Safari и нажми кнопку снова."
+            }
         } catch {
             status = error.localizedDescription
         }
