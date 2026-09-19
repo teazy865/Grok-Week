@@ -54,11 +54,11 @@ struct UsageWidgetView: View {
                     Text(used)
                         .font(isSmall ? .caption : .body)
                     if let reset = entry.snap.resetAt {
-                        Text("сброс \(reset.formatted(date: .abbreviated, time: .shortened))")
+                        Text(resetLine(reset))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.7)
+                            .minimumScaleFactor(0.8)
                     }
                     Text(entry.snap.updatedAt.formatted(date: .omitted, time: .shortened))
                         .font(.caption2)
@@ -83,13 +83,24 @@ struct UsageWidgetView: View {
         }
         .containerBackground(for: .widget) { Color.black }
     }
+
+    private func resetLine(_ reset: Date) -> String {
+        if isSmall {
+            let compact = reset.formatted(
+                .dateTime.day().month(.abbreviated).hour().minute()
+                    .locale(Locale(identifier: "ru_RU"))
+            )
+            return "сброс \(compact)"
+        }
+        return "сброс \(reset.formatted(date: .abbreviated, time: .shortened))"
+    }
 }
 
 @main
 struct UsageWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "UsageWidget", provider: Provider()) { UsageWidgetView(entry: $0) }
-            .configurationDisplayName("Grok Usage")
+            .configurationDisplayName("Неделя Grok")
             .description("Сколько осталось недельного пула")
             .supportedFamilies([.systemSmall, .systemMedium])
             .contentMarginsDisabled()
