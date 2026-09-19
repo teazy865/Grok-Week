@@ -2,11 +2,11 @@ name: AILimits
 options:
   bundleIdPrefix: com.teazy
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "17.0"
   createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.3"
-  CURRENT_PROJECT_VERSION: "4"
+  MARKETING_VERSION: "0.3.1"
+  CURRENT_PROJECT_VERSION: "5"
 targets:
   AILimits:
     type: application
@@ -18,7 +18,7 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits
       TARGETED_DEVICE_FAMILY: "1"
-      IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+      IPHONEOS_DEPLOYMENT_TARGET: "17.0"
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_FILE: AILimits/Info.plist
       INFOPLIST_KEY_CFBundleDisplayName: AI Limits
@@ -27,8 +27,6 @@ targets:
       - target: UsageWidget
         embed: true
         codeSign: false
-    scheme:
-      gatherCoverageData: false
   UsageWidget:
     type: app-extension
     platform: iOS
@@ -41,7 +39,7 @@ targets:
       - path: AILimits/UsageStore.swift
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits.widget
-      IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+      IPHONEOS_DEPLOYMENT_TARGET: "17.0"
       GENERATE_INFOPLIST_FILE: NO
       INFOPLIST_FILE: Widget/Info.plist
       CODE_SIGNING_ALLOWED: NO
