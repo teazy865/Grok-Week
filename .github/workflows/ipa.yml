@@ -1,0 +1,45 @@
+name: Build IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "AILimits/**"
+      - "project.yml"
+      - ".github/workflows/ipa.yml"
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build unsigned app (iphoneos arm64)
+        run: |
+          xcodebuild \
+            -project AILimits.xcodeproj \
+            -scheme AILimits \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+      - name: Pack IPA
+        run: |
+          APP=$(find ~/Library/Developer/Xcode/DerivedData -name 'AILimits.app' | head -n 1)
+          if [ -z "$APP" ]; then APP=$(find . -name 'AILimits.app' | head -n 1); fi
+          echo "APP=$APP"
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -r AILimits.ipa Payload
+          ls -lh AILimits.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AILimits-unsigned-ipa
+          path: AILimits.ipa
