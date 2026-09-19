@@ -37,28 +37,37 @@ struct UsageWidgetView: View {
 
     var body: some View {
         let left = entry.snap.percentLeft.map { "\(Int($0.rounded()))%" } ?? "нет %"
-        let used = entry.snap.percentUsed.map { "\(Int($0.rounded()))% used" } ?? "—"
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("Grok week").font(.headline)
-                Spacer()
-                Button(intent: RefreshUsageIntent()) {
-                    Image(systemName: "arrow.clockwise")
+        let used = entry.snap.percentUsed.map { "\(Int($0.rounded()))% использовано" } ?? "—"
+        GeometryReader { geo in
+            let lead = geo.size.width * 0.15
+            let vPad = geo.size.height * 0.05
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Неделя Grok").font(.headline)
+                Text(left).font(.title2.bold())
+                ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100)).tint(.orange)
+                if family != .systemSmall {
+                    Text(used)
+                    if let reset = entry.snap.resetAt {
+                        Text("сброс \(reset.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text(entry.snap.updatedAt.formatted(date: .omitted, time: .shortened))
+                        .font(.caption2).foregroundStyle(.secondary)
                 }
-                .buttonStyle(.plain)
-                .tint(.orange)
-            }
-            Text(left).font(.title2.bold())
-            ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100)).tint(.orange)
-            if family != .systemSmall {
-                Text(used)
-                if let reset = entry.snap.resetAt {
-                    Text("сброс \(reset.formatted(date: .abbreviated, time: .shortened))")
-                        .font(.caption).foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                HStack {
+                    Spacer()
+                    Button(intent: RefreshUsageIntent()) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(.plain)
+                    .tint(.orange)
                 }
-                Text(entry.snap.updatedAt.formatted(date: .omitted, time: .shortened))
-                    .font(.caption2).foregroundStyle(.secondary)
+                .padding(.top, vPad)
+                .padding(.bottom, vPad)
             }
+            .padding(.leading, lead)
+            .padding(.trailing, 12)
         }
         .containerBackground(for: .widget) { Color.black }
     }
