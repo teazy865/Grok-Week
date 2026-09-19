@@ -3,28 +3,47 @@ options:
   bundleIdPrefix: com.teazy
   deploymentTarget:
     iOS: "16.0"
+  createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.2.1"
-  CURRENT_PROJECT_VERSION: "3"
+  MARKETING_VERSION: "0.3"
+  CURRENT_PROJECT_VERSION: "4"
 targets:
   AILimits:
     type: application
     platform: iOS
     sources:
       - path: AILimits
-    info:
-      path: AILimits/Info.plist
-      properties:
-        CFBundleDisplayName: AI Limits
-        CFBundleShortVersionString: "0.2.1"
-        CFBundleVersion: "3"
-        UILaunchScreen: {}
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UIStatusBarStyle: UIStatusBarStyleLightContent
+        excludes:
+          - "*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits
       TARGETED_DEVICE_FAMILY: "1"
       IPHONEOS_DEPLOYMENT_TARGET: "16.0"
-      INFOPLIST_FILE: AILimits/Info.plist
       GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_FILE: AILimits/Info.plist
+      INFOPLIST_KEY_CFBundleDisplayName: AI Limits
       CODE_SIGNING_ALLOWED: NO
+    dependencies:
+      - target: UsageWidget
+        embed: true
+        codeSign: false
+    scheme:
+      gatherCoverageData: false
+  UsageWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widget
+        excludes:
+          - "*.entitlements"
+      - path: AILimits/Models.swift
+      - path: AILimits/AppGroup.swift
+      - path: AILimits/UsageStore.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits.widget
+      IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+      GENERATE_INFOPLIST_FILE: NO
+      INFOPLIST_FILE: Widget/Info.plist
+      CODE_SIGNING_ALLOWED: NO
+      SKIP_INSTALL: YES
+      LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"

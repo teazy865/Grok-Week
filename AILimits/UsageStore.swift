@@ -1,9 +1,10 @@
 import Foundation
-import WidgetKit
 
 enum UsageStore {
     static func load() -> UsageSnapshot {
-        guard let data = AppGroup.defaults.data(forKey: AppGroup.snapshotKey),
+        let data = AppGroup.defaults.data(forKey: AppGroup.snapshotKey)
+            ?? UserDefaults.standard.data(forKey: AppGroup.snapshotKey)
+        guard let data,
               let snap = try? JSONDecoder().decode(UsageSnapshot.self, from: data) else {
             return .empty
         }
@@ -11,9 +12,15 @@ enum UsageStore {
     }
 
     static func save(_ snap: UsageSnapshot) {
-        if let data = try? JSONEncoder().encode(snap) {
-            AppGroup.defaults.set(data, forKey: AppGroup.snapshotKey)
-        }
-        WidgetCenter.shared.reloadAllTimelines()
+        guard let data = try? JSONEncoder().encode(snap) else { return }
+        AppGroup.defaults.set(data, forKey: AppGroup.snapshotKey)
+        UserDefaults.standard.set(data, forKey: AppGroup.snapshotKey)
+        reloadWidgets()
+    }
+
+    private static func reloadWidgets() {
+        guard let cls = NSClassFromString("WidgetKit.WidgetCenter") as? NSObject.Type else { return }
+        let center = cls.perform(NSSelectorFromString("shared"))?.takeUnretainedValue() as? NSObject
+        _ = center?.perform(NSSelectorFromString("reloadAllTimelines"))
     }
 }
