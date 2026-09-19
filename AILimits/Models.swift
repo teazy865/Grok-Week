@@ -1,19 +1,26 @@
 import Foundation
 
-struct UsageSnapshot: Equatable {
-    var percentUsed: Double
-    var resetAt: Date
+struct UsageSnapshot: Codable, Equatable {
+    var percentUsed: Double?
+    var resetAt: Date?
     var updatedAt: Date
-    var breakdown: [(name: String, value: Double)]
+    var plan: String?
+    var error: String?
+    var signedIn: Bool
+    var breakdown: [String: Double]
 
-    var percentLeft: Double { max(0, 100 - percentUsed) }
+    var percentLeft: Double? {
+        guard let used = percentUsed else { return nil }
+        return max(0, 100 - used)
+    }
 
     static var empty: UsageSnapshot {
-        UsageSnapshot(
-            percentUsed: 0,
-            resetAt: Date().addingTimeInterval(7 * 24 * 3600),
-            updatedAt: Date(),
-            breakdown: [("Chat", 0), ("Imagine", 0), ("Voice", 0), ("Build", 0)]
-        )
+        UsageSnapshot(percentUsed: nil, resetAt: nil, updatedAt: Date(), plan: nil, error: nil, signedIn: false, breakdown: [:])
     }
+}
+
+struct TokenSet: Codable {
+    var accessToken: String
+    var refreshToken: String?
+    var expiresAt: Date
 }

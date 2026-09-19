@@ -1,22 +1,28 @@
 # AI Limits
 
-Нативное iOS-приложение для личного трекера лимита Grok. Сайта нет — только SwiftUI, как оболочка у «На улицу», но без WebView.
+Нативное iOS-приложение: недельный пул SuperGrok и виджет.
 
-Репозиторий: https://github.com/teazy865/ai-limits
+Вход — device code на auth.x.ai (как Grok CLI). Цифры — `GET cli-chat-proxy.grok.com/v1/billing?format=credits` (`creditUsagePercent`). Токен только в Keychain.
 
-## Локально
+Репо: https://github.com/teazy865/ai-limits
+
+## Сборка для GBox
 
 ```bash
-brew install xcodegen
+git clone https://github.com/teazy865/ai-limits.git
 cd ai-limits
+brew install xcodegen
 xcodegen generate
 open AILimits.xcodeproj
 ```
 
-В Xcode выбери свою Team и поставь на iPhone.
+В Xcode: своя Team, включи App Group `group.com.teazy.ailimits` у приложения и виджета. Либо собери IPA акшеном и подпиши в GBox.
 
-## GitHub Actions
+## Как пользоваться
 
-`.github/workflows/ipa.yml` собирает **unsigned IPA** (как у na-ulitsu) и кладёт артефакт `AILimits-unsigned-ipa`.
+1. Открой приложение → **Войти в xAI**.
+2. Откроется страница xAI. Введи показанный код.
+3. Дождись «Готово» — кольцо покажет % использования за неделю и сколько осталось.
+4. Добавь виджет **Grok Usage** на домашний экран.
 
-Actions → Build IPA → Run workflow.
+Неофициальный endpoint CLI. xAI может его сменить.

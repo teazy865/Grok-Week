@@ -3,28 +3,56 @@ options:
   bundleIdPrefix: com.teazy
   deploymentTarget:
     iOS: "17.0"
+  createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.1"
-  CURRENT_PROJECT_VERSION: "1"
+  MARKETING_VERSION: "0.2"
+  CURRENT_PROJECT_VERSION: "2"
 targets:
   AILimits:
     type: application
     platform: iOS
     sources:
       - path: AILimits
-    info:
-      path: AILimits/Info.plist
-      properties:
-        CFBundleDisplayName: AI Limits
-        CFBundleShortVersionString: "0.1"
-        CFBundleVersion: "1"
-        UILaunchScreen: {}
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UIStatusBarStyle: UIStatusBarStyleLightContent
+        excludes:
+          - "WidgetOnly/**"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits
       TARGETED_DEVICE_FAMILY: "1"
       IPHONEOS_DEPLOYMENT_TARGET: "17.0"
-      INFOPLIST_FILE: AILimits/Info.plist
       GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_KEY_CFBundleDisplayName: AI Limits
+      INFOPLIST_KEY_UILaunchScreen_Generation: YES
+      INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+      CODE_SIGN_ENTITLEMENTS: AILimits/AILimits.entitlements
       CODE_SIGNING_ALLOWED: NO
+    entitlements:
+      path: AILimits/AILimits.entitlements
+    dependencies:
+      - target: UsageWidget
+        embed: true
+        codeSign: true
+  UsageWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widget
+      - path: AILimits/Models.swift
+      - path: AILimits/AppGroup.swift
+      - path: AILimits/UsageStore.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits.widget
+      GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_KEY_CFBundleDisplayName: Grok Usage
+      INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
+      CODE_SIGN_ENTITLEMENTS: Widget/Widget.entitlements
+      CODE_SIGNING_ALLOWED: NO
+      SKIP_INSTALL: YES
+      LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+    entitlements:
+      path: Widget/Widget.entitlements
+schemes:
+  AILimits:
+    build:
+      targets:
+        AILimits: all
+        UsageWidget: all

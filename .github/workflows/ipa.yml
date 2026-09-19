@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "AILimits/**"
+      - "Widget/**"
       - "project.yml"
       - ".github/workflows/ipa.yml"
 
