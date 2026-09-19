@@ -16,13 +16,11 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Decode app icon
+      - name: Generate app icons
         run: |
-          mkdir -p AILimits/Assets.xcassets/AppIcon.appiconset
-          if [ -f scripts/AppIcon.png.b64 ]; then
-            base64 -d scripts/AppIcon.png.b64 > AILimits/Assets.xcassets/AppIcon.appiconset/AppIcon.png
-          fi
-          ls -lh AILimits/Assets.xcassets/AppIcon.appiconset/ || true
+          python3 -m pip install --user pillow
+          python3 scripts/generate_appicon.py
+          ls -lh AILimits/Assets.xcassets/AppIcon.appiconset/
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
