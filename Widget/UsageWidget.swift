@@ -15,14 +15,19 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
-        let snap = UsageStore.load()
-        let now = Date()
-        var entries: [Entry] = [Entry(date: now, snap: snap)]
-        if let t = Calendar.current.date(byAdding: .minute, value: 5, to: now) {
-            entries.append(Entry(date: t, snap: snap))
+        Task {
+            await UsageRefresher.run()
+            let snap = UsageStore.load()
+            let now = Date()
+            var entries: [Entry] = []
+            for i in 0..<6 {
+                let t = now.addingTimeInterval(TimeInterval(i * 50))
+                entries.append(Entry(date: t, snap: snap))
+            }
+            let next = Calendar.current.date(byAdding: .minute, value: 5, to: now)
+                ?? now.addingTimeInterval(300)
+            completion(Timeline(entries: entries, policy: .after(next)))
         }
-        let next = Calendar.current.date(byAdding: .minute, value: 5, to: now) ?? now.addingTimeInterval(300)
-        completion(Timeline(entries: entries, policy: .after(next)))
     }
 }
 
@@ -66,5 +71,6 @@ struct UsageWidget: Widget {
             .configurationDisplayName("Grok Usage")
             .description("Сколько осталось недельного пула")
             .supportedFamilies([.systemSmall, .systemMedium])
+            .contentMarginsDisabled()
     }
 }

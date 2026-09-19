@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import WidgetKit
 
 struct RefreshUsageIntent: AppIntent {
     static var title: LocalizedStringResource = "Обновить Grok"
@@ -8,6 +9,7 @@ struct RefreshUsageIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await UsageRefresher.run()
+        WidgetCenter.shared.reloadTimelines(ofKind: "UsageWidget")
         return .result()
     }
 }
