@@ -7,17 +7,22 @@ on:
     paths:
       - "AILimits/**"
       - "Widget/**"
-      - "scripts/**"
       - "project.yml"
       - ".github/workflows/ipa.yml"
+      - "scripts/**"
 
 jobs:
   ipa:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Generate app icon
-        run: python3 scripts/make_icon.py
+      - name: Decode app icon
+        run: |
+          mkdir -p AILimits/Assets.xcassets/AppIcon.appiconset
+          if [ -f scripts/AppIcon.png.b64 ]; then
+            base64 -d scripts/AppIcon.png.b64 > AILimits/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+          fi
+          ls -lh AILimits/Assets.xcassets/AppIcon.appiconset/ || true
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
@@ -33,7 +38,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
             build
       - name: Pack IPA
         run: |

@@ -5,7 +5,7 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.4"
+  MARKETING_VERSION: "0.4.0"
   CURRENT_PROJECT_VERSION: "6"
 targets:
   AILimits:
@@ -13,6 +13,8 @@ targets:
     platform: iOS
     sources:
       - path: AILimits
+        excludes:
+          - "*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits
       TARGETED_DEVICE_FAMILY: "1"
@@ -31,12 +33,14 @@ targets:
     platform: iOS
     sources:
       - path: Widget
+        excludes:
+          - "*.entitlements"
       - path: AILimits/Models.swift
       - path: AILimits/AppGroup.swift
       - path: AILimits/UsageStore.swift
       - path: AILimits/TokenStore.swift
-      - path: AILimits/XAIAuth.swift
       - path: AILimits/BillingClient.swift
+      - path: AILimits/XAIAuth.swift
       - path: AILimits/RefreshIntent.swift
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits.widget
