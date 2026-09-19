@@ -6,6 +6,8 @@ iOS-приложение и виджет: сколько осталось нед
 
 **Не является продуктом xAI.** Неофициальный личный трекер. API может измениться без предупреждения.
 
+Репо: [teazy865/Grok-Week](https://github.com/teazy865/Grok-Week)
+
 ## Что умеет
 
 - вход через device code на `auth.x.ai` (как Grok CLI)
@@ -17,7 +19,7 @@ iOS-приложение и виджет: сколько осталось нед
 
 ## Установка через GBox
 
-1. Открой [Actions → Build IPA](https://github.com/teazy865/ai-limits/actions/workflows/ipa.yml).
+1. Открой [Actions → Build IPA](https://github.com/teazy865/Grok-Week/actions/workflows/ipa.yml).
 2. В последнем успешном прогоне скачай artifact `AILimits-unsigned-ipa`.
 3. Подпиши IPA в GBox и установи.
 4. Открой приложение → **Войти в xAI** → введи код на странице xAI.
@@ -28,8 +30,8 @@ iOS-приложение и виджет: сколько осталось нед
 ## Сборка из Xcode
 
 ```bash
-git clone https://github.com/teazy865/ai-limits.git
-cd ai-limits
+git clone https://github.com/teazy865/Grok-Week.git
+cd Grok-Week
 brew install xcodegen
 xcodegen generate
 open AILimits.xcodeproj
