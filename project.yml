@@ -5,8 +5,8 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.5.0"
-  CURRENT_PROJECT_VERSION: "7"
+  MARKETING_VERSION: "0.5.1"
+  CURRENT_PROJECT_VERSION: "8"
 targets:
   AILimits:
     type: application
@@ -51,4 +51,5 @@ targets:
       CODE_SIGN_ENTITLEMENTS: Widget/Widget.entitlements
       CODE_SIGNING_ALLOWED: NO
       SKIP_INSTALL: YES
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) WIDGET"
       LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"

@@ -1,5 +1,5 @@
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !WIDGET
 import UIKit
 #endif
 
@@ -113,7 +113,7 @@ enum XAIAuth {
     }
 
     static func open(_ url: URL) {
-        #if canImport(UIKit)
+        #if canImport(UIKit) && !WIDGET
         DispatchQueue.main.async { UIApplication.shared.open(url) }
         #endif
     }
