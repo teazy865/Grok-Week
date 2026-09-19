@@ -1,8 +1,10 @@
-Decode before Xcode/CI:
+Approved mark + orange usage-counter badge.
 
-    bash scripts/decode_icons.sh
+Generate PNGs (needs Pillow):
 
-Sources:
-- scripts/AppIcon.png.b64 — light (black mark + orange badge on white)
-- scripts/AppIcon-dark.png.b64 — dark
-- scripts/AppIcon-tinted.png.b64 — template for iOS tinted icons
+    python3 scripts/generate_appicon.py
+
+Writes light / dark / tinted 1024 icons into
+`AILimits/Assets.xcassets/AppIcon.appiconset/`.
+
+Not merged to main yet — no IPA build.
