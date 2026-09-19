@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - "AILimits/**"
+      - "Widget/**"
+      - "scripts/**"
       - "project.yml"
       - ".github/workflows/ipa.yml"
 
@@ -14,6 +16,8 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - name: Generate app icon
+        run: python3 scripts/make_icon.py
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
@@ -29,6 +33,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
             build
       - name: Pack IPA
         run: |

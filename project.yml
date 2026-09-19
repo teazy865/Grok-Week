@@ -5,16 +5,14 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
 settings:
-  MARKETING_VERSION: "0.3.1"
-  CURRENT_PROJECT_VERSION: "5"
+  MARKETING_VERSION: "0.4"
+  CURRENT_PROJECT_VERSION: "6"
 targets:
   AILimits:
     type: application
     platform: iOS
     sources:
       - path: AILimits
-        excludes:
-          - "*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits
       TARGETED_DEVICE_FAMILY: "1"
@@ -22,6 +20,7 @@ targets:
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_FILE: AILimits/Info.plist
       INFOPLIST_KEY_CFBundleDisplayName: AI Limits
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       CODE_SIGNING_ALLOWED: NO
     dependencies:
       - target: UsageWidget
@@ -32,11 +31,13 @@ targets:
     platform: iOS
     sources:
       - path: Widget
-        excludes:
-          - "*.entitlements"
       - path: AILimits/Models.swift
       - path: AILimits/AppGroup.swift
       - path: AILimits/UsageStore.swift
+      - path: AILimits/TokenStore.swift
+      - path: AILimits/XAIAuth.swift
+      - path: AILimits/BillingClient.swift
+      - path: AILimits/RefreshIntent.swift
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.teazy.ailimits.widget
       IPHONEOS_DEPLOYMENT_TARGET: "17.0"

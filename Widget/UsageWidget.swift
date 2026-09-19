@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import AppIntents
 
 struct Entry: TimelineEntry {
     let date: Date
@@ -13,7 +14,7 @@ struct Provider: TimelineProvider {
     }
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         let snap = UsageStore.load()
-        let next = Calendar.current.date(byAdding: .minute, value: 30, to: Date()) ?? Date()
+        let next = Date().addingTimeInterval(5 * 60)
         completion(Timeline(entries: [Entry(date: Date(), snap: snap)], policy: .after(next)))
     }
 }
@@ -24,13 +25,21 @@ struct UsageWidgetView: View {
 
     var body: some View {
         let left = entry.snap.percentLeft.map { "\(Int($0.rounded()))% left" } ?? "нет %"
-        let used = entry.snap.percentUsed.map { "\(Int($0.rounded()))% used" } ?? "—"
         VStack(alignment: .leading, spacing: 6) {
-            Text("Grok week").font(.headline)
+            HStack {
+                Text("Grok week").font(.headline)
+                Spacer()
+                Button(intent: RefreshUsageIntent()) {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.plain)
+            }
             Text(left).font(.title2.bold())
             ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100)).tint(.orange)
             if family != .systemSmall {
-                Text(used)
+                if let used = entry.snap.percentUsed {
+                    Text("\(Int(used.rounded()))% used")
+                }
                 if let reset = entry.snap.resetAt {
                     Text("сброс \(reset.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption).foregroundStyle(.secondary)
@@ -46,7 +55,7 @@ struct UsageWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "UsageWidget", provider: Provider()) { UsageWidgetView(entry: $0) }
         .configurationDisplayName("Grok Usage")
-        .description("Сколько осталось недельного пула")
+        .description("Остаток недели, обновление каждые 5 мин")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
