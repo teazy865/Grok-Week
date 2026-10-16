@@ -34,8 +34,10 @@ struct Provider: TimelineProvider {
 struct UsageWidgetView: View {
     var entry: Entry
     @Environment(\.widgetFamily) private var family
+    @Environment(\.colorScheme) private var colorScheme
 
     private var isSmall: Bool { family == .systemSmall }
+    private var ink: Color { colorScheme == .dark ? .white : .black }
 
     var body: some View {
         let left = entry.snap.percentLeft.map { "\(Int($0.rounded()))%" } ?? "нет %"
@@ -47,12 +49,15 @@ struct UsageWidgetView: View {
                     if isSmall { Spacer(minLength: 10) }
                     Text("Неделя Grok")
                         .font(isSmall ? .subheadline.weight(.semibold) : .headline)
+                        .foregroundStyle(ink)
                     Text(left)
                         .font(isSmall ? .title3.bold() : .title2.bold())
+                        .foregroundStyle(ink)
                     ProgressView(value: min(1, (entry.snap.percentUsed ?? 0) / 100))
                         .tint(.orange)
                     Text(used)
                         .font(isSmall ? .caption : .body)
+                        .foregroundStyle(ink)
                     if let reset = entry.snap.resetAt {
                         Text(resetLine(reset))
                             .font(.caption)
@@ -73,15 +78,17 @@ struct UsageWidgetView: View {
                 Button(intent: RefreshUsageIntent()) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(ink)
                         .padding(8)
                 }
                 .buttonStyle(.plain)
-                .tint(.white)
                 .padding(.trailing, 8)
                 .padding(.bottom, 8)
             }
         }
-        .containerBackground(for: .widget) { Color.black }
+        .containerBackground(for: .widget) {
+            colorScheme == .dark ? Color.black : Color.white
+        }
     }
 
     private func resetLine(_ reset: Date) -> String {
